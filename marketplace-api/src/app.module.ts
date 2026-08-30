@@ -14,6 +14,7 @@ import { OrdersModule } from './orders/orders.module';
 import { ReelsModule } from './reels/reels.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { AdminModule } from './admin/admin.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AdminModule } from './admin/admin.module';
     ReelsModule,
     ReviewsModule,
     AdminModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [

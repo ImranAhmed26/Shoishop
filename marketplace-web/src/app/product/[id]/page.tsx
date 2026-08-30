@@ -1,51 +1,118 @@
-'use client';
-
-import { use, useState } from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { usePublicProduct } from '@/hooks/use-storefront';
-import { useCart } from '@/contexts/cart-context';
+import { notFound } from 'next/navigation';
+import { API_URL } from '@/lib/api';
+import { SITE_URL } from '@/lib/seo';
+import { Product } from '@/lib/types';
+import { Breadcrumbs } from '@/components/breadcrumbs';
+import { ProductAddToCart } from '@/components/product-add-to-cart';
 import { ProductReviews } from '@/components/product-reviews';
 
 function formatPrice(cents: number, currency: string) {
   return `${(cents / 100).toFixed(2)} ${currency}`;
 }
 
-export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
-  const { data: product, isLoading, isError } = usePublicProduct(id);
-  const { addItem } = useCart();
-  const [added, setAdded] = useState(false);
+async function getProduct(id: string): Promise<Product | null> {
+  try {
+    const res = await fetch(`${API_URL}/products/${id}`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
 
-  if (isLoading) {
-    return <p className="mx-auto max-w-3xl px-4 py-8 text-sm text-gray-500">Loading product...</p>;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProduct(id);
+  if (!product) {
+    return { title: 'Product not found — Shoishop' };
   }
 
-  if (isError || !product) {
-    return <p className="mx-auto max-w-3xl px-4 py-8 text-sm text-gray-500">Product not found.</p>;
-  }
+  const description =
+    product.description?.slice(0, 160) ??
+    `Buy ${product.title} from ${product.shop?.name ?? 'a local shop'} on Shoishop.`;
+  const image = product.images?.[0];
 
-  function handleAddToCart() {
-    if (!product) return;
-    addItem({
-      productId: product.id,
-      shopId: product.shopId,
+  return {
+    title: `${product.title} — Shoishop`,
+    description,
+    alternates: { canonical: `${SITE_URL}/product/${product.id}` },
+    openGraph: {
       title: product.title,
-      priceCents: product.priceCents,
-      currency: product.currency,
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+      description,
+      type: 'website',
+      images: image ? [{ url: `${SITE_URL}${image}` }] : undefined,
+    },
+  };
+}
+
+export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const product = await getProduct(id);
+
+  if (!product) {
+    notFound();
   }
+
+  const image = product.images?.[0];
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    description: product.description ?? undefined,
+    image: image ? [`${SITE_URL}${image}`] : undefined,
+    sku: product.id,
+    brand: product.shop ? { '@type': 'Organization', name: product.shop.name } : undefined,
+    aggregateRating: product.reviewCount
+      ? {
+          '@type': 'AggregateRating',
+          ratingValue: product.avgRating ?? 0,
+          reviewCount: product.reviewCount,
+        }
+      : undefined,
+    offers: {
+      '@type': 'Offer',
+      url: `${SITE_URL}/product/${product.id}`,
+      price: (product.priceCents / 100).toFixed(2),
+      priceCurrency: product.currency,
+      availability:
+        product.stockQty > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    },
+  };
+
+  const breadcrumbItems = [
+    { name: 'Home', path: '/' },
+    ...(product.category
+      ? [{ name: product.category.name, path: `/category/${product.category.slug}` }]
+      : []),
+    { name: product.title, path: `/product/${product.id}` },
+  ];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <Breadcrumbs items={breadcrumbItems} />
       {product.shop && (
         <Link href={`/shop/${product.shop.slug}`} className="text-xs text-gray-500 underline">
           {product.shop.name}
         </Link>
       )}
       <div className="mt-4 grid gap-6 sm:grid-cols-2">
-        <div className="aspect-square rounded bg-gray-100 dark:bg-gray-900" />
+        <div className="aspect-square overflow-hidden rounded bg-gray-100 dark:bg-gray-900">
+          {image && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={image} alt={product.title} className="h-full w-full object-cover" />
+          )}
+        </div>
         <div>
           <h1 className="text-xl font-semibold">{product.title}</h1>
           {product.reviewCount ? (
@@ -65,13 +132,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           <p className="mt-2 text-xs text-gray-500">
             {product.stockQty > 0 ? `${product.stockQty} in stock` : 'Out of stock'}
           </p>
-          <button
-            onClick={handleAddToCart}
-            disabled={product.stockQty <= 0}
-            className="mt-4 rounded bg-orange-600 hover:bg-orange-700 px-4 py-2 text-sm text-white disabled:opacity-50"
-          >
-            {added ? 'Added!' : 'Add to cart'}
-          </button>
+          <ProductAddToCart product={product} />
         </div>
       </div>
       <ProductReviews productId={product.id} />

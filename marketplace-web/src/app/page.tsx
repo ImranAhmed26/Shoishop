@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { ReelsFeed } from '@/components/reels/reels-feed';
 import { API_URL } from '@/lib/api';
-import { Product } from '@/lib/types';
+import { Product, Category } from '@/lib/types';
 
 export const metadata: Metadata = {
   title: 'Shoishop — Shop from local vendors',
@@ -49,6 +49,16 @@ async function getHomepageProducts(searchParams: HomeSearchParams): Promise<Publ
   }
 }
 
+async function getCategories(): Promise<Category[]> {
+  try {
+    const res = await fetch(`${API_URL}/categories`, { next: { revalidate: 300 } });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
 function formatPrice(cents: number, currency: string) {
   return `${(cents / 100).toFixed(2)} ${currency}`;
 }
@@ -59,7 +69,10 @@ export default async function Home({
   searchParams: Promise<HomeSearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
-  const { items: products } = await getHomepageProducts(resolvedSearchParams);
+  const [{ items: products }, categories] = await Promise.all([
+    getHomepageProducts(resolvedSearchParams),
+    getCategories(),
+  ]);
   const isFiltered = Boolean(
     resolvedSearchParams.q ||
       resolvedSearchParams.minPrice ||
@@ -99,6 +112,20 @@ export default async function Home({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
       <ReelsFeed />
+
+      {categories.length > 0 && (
+        <nav aria-label="Categories" className="mt-6 flex flex-wrap gap-2 text-sm">
+          {categories.map((category) => (
+            <Link
+              key={category.slug}
+              href={`/category/${category.slug}`}
+              className="rounded-full border border-gray-200 px-3 py-1 text-gray-600 hover:border-gray-400 dark:border-gray-800 dark:text-gray-300"
+            >
+              {category.name}
+            </Link>
+          ))}
+        </nav>
+      )}
 
       <div className="mt-8">
         <h1 className="text-lg font-semibold">Latest products</h1>
