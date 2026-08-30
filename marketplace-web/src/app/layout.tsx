@@ -18,16 +18,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Shoishop — Shop from local vendors",
+    default: "Shoishop — Everything for Mom & Baby",
     template: "%s",
   },
-  description: "A multi-vendor marketplace connecting buyers with independent local shops.",
+  description:
+    "Shoishop is a marketplace for mom & baby essentials, connecting parents with independent local shops.",
 };
 
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Shoishop",
+  description: "Everything for mom & baby, from local shops you can trust.",
   url: SITE_URL,
   potentialAction: {
     "@type": "SearchAction",

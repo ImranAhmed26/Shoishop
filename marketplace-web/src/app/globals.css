@@ -9,11 +9,23 @@
   color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Shoishop brand palette — warm and soft, tuned for a mom & baby storefront */
+  --brand-primary: #f2607a;
+  --brand-primary-dark: #d94564;
+  --brand-secondary: #7bcdb8;
+  --brand-cream: #fff6ef;
+  --brand-ink: #3a3a3a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-dark: var(--brand-primary-dark);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-ink: var(--brand-ink);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

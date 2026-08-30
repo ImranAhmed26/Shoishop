@@ -5,13 +5,13 @@ import { API_URL } from '@/lib/api';
 import { Product, Category } from '@/lib/types';
 
 export const metadata: Metadata = {
-  title: 'Shoishop — Shop from local vendors',
+  title: 'Shoishop — Everything for Mom & Baby',
   description:
-    'Discover products from independent shops on Shoishop, a multi-vendor marketplace. Browse the latest listings and shop directly from local sellers.',
+    'Shoishop is a marketplace for mom & baby essentials — diapers, feeding, nursery, maternity wear, and more — from independent local shops.',
   openGraph: {
-    title: 'Shoishop — Shop from local vendors',
+    title: 'Shoishop — Everything for Mom & Baby',
     description:
-      'Discover products from independent shops on Shoishop, a multi-vendor marketplace.',
+      'Shop mom & baby essentials from independent local shops, all in one place.',
     type: 'website',
   },
 };
@@ -105,30 +105,46 @@ export default async function Home({
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
+    <div>
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
-      <ReelsFeed />
 
-      {categories.length > 0 && (
-        <nav aria-label="Categories" className="mt-6 flex flex-wrap gap-2 text-sm">
-          {categories.map((category) => (
-            <Link
-              key={category.slug}
-              href={`/category/${category.slug}`}
-              className="rounded-full border border-gray-200 px-3 py-1 text-gray-600 hover:border-gray-400 dark:border-gray-800 dark:text-gray-300"
-            >
-              {category.name}
-            </Link>
-          ))}
-        </nav>
-      )}
+      <section className="bg-brand-cream">
+        <div className="mx-auto max-w-7xl px-4 py-10 text-center sm:py-14">
+          <p className="text-3xl sm:text-4xl" aria-hidden="true">
+            🤰 🍼 👶
+          </p>
+          <h1 className="mt-3 text-2xl font-bold text-brand-primary-dark sm:text-3xl">
+            Shoishop
+          </h1>
+          <p className="mt-1 text-sm text-brand-ink sm:text-base">
+            Everything for mom &amp; baby, from local shops you can trust.
+          </p>
+        </div>
+      </section>
 
-      <div className="mt-8">
-        <h1 className="text-lg font-semibold">Latest products</h1>
+      <div className="mx-auto max-w-7xl px-4 py-6">
+        <ReelsFeed />
+
+        {categories.length > 0 && (
+          <nav aria-label="Categories" className="mt-6 flex flex-wrap gap-2 text-sm">
+            {categories.map((category) => (
+              <Link
+                key={category.slug}
+                href={`/category/${category.slug}`}
+                className="rounded-full border border-brand-secondary bg-white px-3 py-1 text-brand-ink hover:bg-brand-secondary/20"
+              >
+                {category.name}
+              </Link>
+            ))}
+          </nav>
+        )}
+
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold">Latest products</h2>
 
         <form method="GET" className="mt-3 flex flex-wrap items-end gap-3 text-sm">
           <div className="flex flex-col">
@@ -188,7 +204,7 @@ export default async function Home({
           </div>
           <button
             type="submit"
-            className="rounded bg-orange-600 px-3 py-1.5 text-white hover:bg-orange-700"
+            className="rounded bg-brand-primary px-3 py-1.5 text-white hover:bg-brand-primary-dark"
           >
             Apply
           </button>
@@ -209,7 +225,7 @@ export default async function Home({
               <Link
                 key={product.id}
                 href={`/product/${product.id}`}
-                className="overflow-hidden rounded border border-gray-200 text-sm hover:border-gray-400"
+                className="overflow-hidden rounded border border-gray-200 text-sm hover:border-brand-primary"
               >
                 <div className="aspect-square overflow-hidden bg-gray-100">
                   {product.images?.[0] && (
@@ -233,6 +249,7 @@ export default async function Home({
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

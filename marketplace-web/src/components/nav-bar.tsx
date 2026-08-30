@@ -10,8 +10,16 @@ export function NavBar() {
   return (
     <header className="border-b border-gray-200 dark:border-gray-800">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-        <Link href="/" className="font-semibold">
-          Marketplace
+        <Link href="/" className="flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary text-base">
+            🍼
+          </span>
+          <span className="flex flex-col leading-none">
+            <span className="text-lg font-bold text-brand-primary-dark">Shoishop</span>
+            <span className="hidden text-[10px] tracking-wide text-gray-500 sm:block">
+              For mom &amp; baby
+            </span>
+          </span>
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/">Home</Link>
@@ -32,7 +40,10 @@ export function NavBar() {
             !isLoading && (
               <>
                 <Link href="/login">Log in</Link>
-                <Link href="/signup" className="rounded bg-orange-600 hover:bg-orange-700 px-3 py-1 text-white">
+                <Link
+                  href="/signup"
+                  className="rounded bg-brand-primary px-3 py-1 text-white hover:bg-brand-primary-dark"
+                >
                   Sign up
                 </Link>
               </>
