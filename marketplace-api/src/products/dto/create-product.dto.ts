@@ -51,20 +51,29 @@ export class CreateProductDto {
   @Min(0)
   weight?: number;
 
+  @IsOptional()
+  @IsString()
+  age?: string;
+
+  @IsOptional()
+  @IsString()
+  size?: string;
+
+  @IsOptional()
+  @IsString()
+  variation?: string;
+
   /** Pass null to clear the category on update; omit to leave it unchanged. */
   @IsOptional()
   @ValidateIf((_, value) => value !== null)
   @IsUUID()
   categoryId?: string | null;
 
+  /** Pass null to clear the brand on update; omit to leave it unchanged. */
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @IsUUID()
-  brandId?: string;
-
-  /** Convenience for the dashboard UI: find-or-create a Brand by name instead of an id. */
-  @IsOptional()
-  @IsString()
-  brandName?: string;
+  brandId?: string | null;
 
   @IsOptional()
   @IsArray()

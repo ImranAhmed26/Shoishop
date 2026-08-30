@@ -16,22 +16,6 @@ export function slugify(text: string): string {
 export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async resolveBrandId(dto: {
-    brandId?: string;
-    brandName?: string;
-  }): Promise<string | undefined> {
-    if (dto.brandName?.trim()) {
-      const slug = slugify(dto.brandName);
-      const brand = await this.prisma.brand.upsert({
-        where: { slug },
-        update: {},
-        create: { name: dto.brandName.trim(), slug },
-      });
-      return brand.id;
-    }
-    return dto.brandId;
-  }
-
   async generateUniqueSlug(shopId: string, title: string): Promise<string> {
     const base = slugify(title) || 'product';
     let slug = base;
@@ -44,10 +28,7 @@ export class ProductsService {
   }
 
   async create(shopId: string, dto: CreateProductDto): Promise<Product> {
-    const [slug, brandId] = await Promise.all([
-      this.generateUniqueSlug(shopId, dto.title),
-      this.resolveBrandId(dto),
-    ]);
+    const slug = await this.generateUniqueSlug(shopId, dto.title);
 
     return this.prisma.product.create({
       data: {
@@ -60,8 +41,11 @@ export class ProductsService {
         costPriceCents: dto.costPriceCents,
         stockQty: dto.stockQty ?? 0,
         weight: dto.weight,
+        age: dto.age,
+        size: dto.size,
+        variation: dto.variation,
         categoryId: dto.categoryId,
-        brandId,
+        brandId: dto.brandId,
         images: dto.images ?? [],
         status: dto.status ?? 'DRAFT',
         visibility: dto.visibility ?? 'VISIBLE',
@@ -83,7 +67,6 @@ export class ProductsService {
       throw new NotFoundException('Product not found for this shop');
     }
 
-    const brandId = await this.resolveBrandId(dto);
     const data: Prisma.ProductUpdateInput = {
       title: dto.title,
       description: dto.description,
@@ -92,6 +75,9 @@ export class ProductsService {
       costPriceCents: dto.costPriceCents,
       stockQty: dto.stockQty,
       weight: dto.weight,
+      age: dto.age,
+      size: dto.size,
+      variation: dto.variation,
       images: dto.images,
       status: dto.status,
       visibility: dto.visibility,
@@ -99,8 +85,8 @@ export class ProductsService {
     if (dto.categoryId !== undefined) {
       data.category = dto.categoryId ? { connect: { id: dto.categoryId } } : { disconnect: true };
     }
-    if (brandId !== undefined) {
-      data.brand = brandId ? { connect: { id: brandId } } : { disconnect: true };
+    if (dto.brandId !== undefined) {
+      data.brand = dto.brandId ? { connect: { id: dto.brandId } } : { disconnect: true };
     }
 
     return this.prisma.product.update({ where: { id: productId }, data });

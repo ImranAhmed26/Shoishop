@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { NavBar } from "@/components/nav-bar";
+import { ConditionalNavBar } from "@/components/conditional-nav-bar";
 import { SITE_URL } from "@/lib/seo";
 
 const geistSans = Geist({
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         <Providers>
-          <NavBar />
+          <ConditionalNavBar />
           <main className="flex-1">{children}</main>
         </Providers>
       </body>

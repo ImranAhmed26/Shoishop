@@ -49,6 +49,9 @@ export interface Product {
   currency: string;
   stockQty: number;
   weight: number | null;
+  age: string | null;
+  size: string | null;
+  variation: string | null;
   categoryId: string | null;
   category?: Category | null;
   brandId: string | null;

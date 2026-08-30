@@ -39,7 +39,7 @@ export class AuthController {
 
   private setAuthCookies(res: Response, tokens: AuthTokens) {
     res.cookie(ACCESS_COOKIE, tokens.accessToken, cookieOptions(15 * 60 * 1000));
-    res.cookie(REFRESH_COOKIE, tokens.refreshToken, cookieOptions(7 * 24 * 60 * 60 * 1000));
+    res.cookie(REFRESH_COOKIE, tokens.refreshToken, cookieOptions(30 * 24 * 60 * 60 * 1000));
   }
 
   @Public()

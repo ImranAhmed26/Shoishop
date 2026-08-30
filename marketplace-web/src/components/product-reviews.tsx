@@ -39,7 +39,7 @@ export function ProductReviews({ productId }: { productId: string }) {
             <li key={review.id} className="rounded border border-gray-200 p-3 text-sm">
               <div className="flex items-center justify-between">
                 <span className="font-medium">{review.buyer?.name ?? 'Buyer'}</span>
-                <span className="text-orange-600">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
+                <span className="text-brand-primary-dark">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
               </div>
               {review.comment && <p className="mt-1 text-gray-600">{review.comment}</p>}
               <p className="mt-1 text-xs text-gray-400">
@@ -78,7 +78,7 @@ export function ProductReviews({ productId }: { productId: string }) {
           <button
             type="submit"
             disabled={createReview.isPending}
-            className="w-fit rounded bg-orange-600 px-3 py-1.5 text-white hover:bg-orange-700 disabled:opacity-50"
+            className="w-fit rounded bg-brand-primary px-3 py-1.5 text-white hover:bg-brand-primary-dark disabled:opacity-50"
           >
             {createReview.isPending ? 'Submitting...' : 'Submit review'}
           </button>

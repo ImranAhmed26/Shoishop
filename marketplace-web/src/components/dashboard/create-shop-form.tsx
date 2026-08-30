@@ -46,7 +46,7 @@ export function CreateShopForm() {
         <button
           type="submit"
           disabled={createShop.isPending || !name}
-          className="rounded bg-orange-600 hover:bg-orange-700 px-3 py-2 text-white disabled:opacity-50"
+          className="rounded bg-brand-primary hover:bg-brand-primary-dark px-3 py-2 text-white disabled:opacity-50"
         >
           {createShop.isPending ? 'Creating...' : 'Create shop'}
         </button>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useCategories, useCreateCategory, useDeleteCategory } from '@/hooks/use-categories';
+import { useBrands, useCreateBrand, useDeleteBrand } from '@/hooks/use-brands';
 import { PageHeader } from '@/components/ui/page-header';
 import { Card } from '@/components/ui/card';
 
@@ -13,10 +13,10 @@ function slugify(text: string) {
     .replace(/(^-+|-+$)/g, '');
 }
 
-export default function AdminCategoriesPage() {
-  const { data: categories, isLoading } = useCategories();
-  const createCategory = useCreateCategory();
-  const deleteCategory = useDeleteCategory();
+export default function AdminBrandsPage() {
+  const { data: brands, isLoading } = useBrands();
+  const createBrand = useCreateBrand();
+  const deleteBrand = useDeleteBrand();
 
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
@@ -27,20 +27,20 @@ export default function AdminCategoriesPage() {
     e.preventDefault();
     setError(null);
     try {
-      await createCategory.mutateAsync({ name, slug: slug || slugify(name) });
+      await createBrand.mutateAsync({ name, slug: slug || slugify(name) });
       setName('');
       setSlug('');
       setSlugEdited(false);
     } catch {
-      setError('Failed to create category. The slug may already be in use.');
+      setError('Failed to create brand. The slug may already be in use.');
     }
   }
 
   return (
     <div>
-      <PageHeader title="Categories" />
+      <PageHeader title="Brands" />
 
-      <Card title="Add a category" className="mb-6">
+      <Card title="Add a brand" className="mb-6">
         <form onSubmit={handleCreate} className="flex flex-wrap items-end gap-3">
           <div className="flex flex-col">
             <label className="text-xs text-gray-500">Name</label>
@@ -68,20 +68,20 @@ export default function AdminCategoriesPage() {
           </div>
           <button
             type="submit"
-            disabled={createCategory.isPending}
+            disabled={createBrand.isPending}
             className="rounded bg-brand-primary hover:bg-brand-primary-dark px-3 py-1.5 text-sm text-white disabled:opacity-50"
           >
-            {createCategory.isPending ? 'Adding...' : 'Add category'}
+            {createBrand.isPending ? 'Adding...' : 'Add brand'}
           </button>
         </form>
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       </Card>
 
-      <Card title="All categories">
+      <Card title="All brands">
         {isLoading ? (
-          <p className="text-sm text-gray-500">Loading categories...</p>
-        ) : categories?.length === 0 ? (
-          <p className="text-sm text-gray-500">No categories yet.</p>
+          <p className="text-sm text-gray-500">Loading brands...</p>
+        ) : brands?.length === 0 ? (
+          <p className="text-sm text-gray-500">No brands yet.</p>
         ) : (
           <table className="w-full text-sm">
             <thead>
@@ -92,13 +92,13 @@ export default function AdminCategoriesPage() {
               </tr>
             </thead>
             <tbody>
-              {categories?.map((category) => (
-                <tr key={category.id} className="border-b border-gray-100 dark:border-gray-900">
-                  <td className="py-2">{category.name}</td>
-                  <td className="py-2 text-gray-500">{category.slug}</td>
+              {brands?.map((brand) => (
+                <tr key={brand.id} className="border-b border-gray-100 dark:border-gray-900">
+                  <td className="py-2">{brand.name}</td>
+                  <td className="py-2 text-gray-500">{brand.slug}</td>
                   <td className="py-2">
                     <button
-                      onClick={() => deleteCategory.mutate(category.id)}
+                      onClick={() => deleteBrand.mutate(brand.id)}
                       className="text-xs text-red-600 underline"
                     >
                       Delete

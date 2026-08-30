@@ -116,6 +116,9 @@ model Product {
   currency            String            @default("BDT")
   stockQty            Int               @default(0)
   weight              Float?
+  age                 String?
+  size                String?
+  variation           String?
   categoryId          String?
   category            Category?         @relation(fields: [categoryId], references: [id])
   brandId             String?

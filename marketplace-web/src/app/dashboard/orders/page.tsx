@@ -1,9 +1,10 @@
 import { OrdersManager } from '@/components/dashboard/orders-manager';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default function DashboardOrdersPage() {
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Orders</h1>
+      <PageHeader title="Orders" />
       <OrdersManager />
     </div>
   );

@@ -20,9 +20,11 @@ interface ProductInput {
   costPriceCents?: number;
   stockQty?: number;
   weight?: number;
+  age?: string;
+  size?: string;
+  variation?: string;
   categoryId?: string | null;
-  brandId?: string;
-  brandName?: string;
+  brandId?: string | null;
   images?: string[];
   status?: ProductStatus;
   visibility?: ProductVisibility;
