@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: shoishop
+      POSTGRES_PASSWORD: shoishop
+      POSTGRES_DB: shoishop
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U shoishop']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./marketplace-api
+    restart: unless-stopped
+    env_file:
+      - ./marketplace-api/.env
+    environment:
+      DATABASE_URL: postgresql://shoishop:shoishop@postgres:5432/shoishop
+      PORT: 4000
+    ports:
+      - '4000:4000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
