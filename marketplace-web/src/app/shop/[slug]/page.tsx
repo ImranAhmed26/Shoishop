@@ -38,11 +38,23 @@ export default function ShopPage({ params }: { params: Promise<{ slug: string }>
               <Link
                 key={product.id}
                 href={`/product/${product.id}`}
-                className="rounded border border-gray-200 p-3 text-sm hover:border-gray-400 dark:border-gray-800"
+                className="overflow-hidden rounded border border-gray-200 text-sm hover:border-gray-400 dark:border-gray-800"
               >
-                <div className="aspect-square rounded bg-gray-100 dark:bg-gray-900" />
-                <p className="mt-2 truncate font-medium">{product.title}</p>
-                <p className="text-gray-500">{formatPrice(product.priceCents, product.currency)}</p>
+                <div className="aspect-square overflow-hidden bg-gray-100 dark:bg-gray-900">
+                  {product.images?.[0] && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={product.images[0]}
+                      alt={product.title}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  )}
+                </div>
+                <div className="px-1.5 py-1">
+                  <p className="truncate font-medium">{product.title}</p>
+                  <p className="text-gray-500">{formatPrice(product.priceCents, product.currency)}</p>
+                </div>
               </Link>
             ))}
           </div>

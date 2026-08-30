@@ -182,9 +182,9 @@ export default async function Home({
               <Link
                 key={product.id}
                 href={`/product/${product.id}`}
-                className="rounded border border-gray-200 p-3 text-sm hover:border-gray-400"
+                className="overflow-hidden rounded border border-gray-200 text-sm hover:border-gray-400"
               >
-                <div className="aspect-square overflow-hidden rounded bg-gray-100">
+                <div className="aspect-square overflow-hidden bg-gray-100">
                   {product.images?.[0] && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -195,11 +195,13 @@ export default async function Home({
                     />
                   )}
                 </div>
-                <p className="mt-2 truncate font-medium">{product.title}</p>
-                <p className="text-gray-500">{formatPrice(product.priceCents, product.currency)}</p>
-                {product.shop && (
-                  <p className="mt-0.5 truncate text-xs text-gray-400">{product.shop.name}</p>
-                )}
+                <div className="px-1.5 py-1">
+                  <p className="truncate font-medium">{product.title}</p>
+                  <p className="text-gray-500">{formatPrice(product.priceCents, product.currency)}</p>
+                  {product.shop && (
+                    <p className="truncate text-xs text-gray-400">{product.shop.name}</p>
+                  )}
+                </div>
               </Link>
             ))}
           </div>
