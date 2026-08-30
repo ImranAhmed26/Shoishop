@@ -1,0 +1,164 @@
+// Prisma schema for the marketplace API
+// See plan: /Users/IM/.claude/plans/cheerful-splashing-bunny.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  BUYER
+  SHOP_OWNER
+  ADMIN
+}
+
+enum ShopStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PLACED
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  COD
+  BKASH
+}
+
+enum ReelStatus {
+  PUBLISHED
+  HIDDEN
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String?
+  googleId     String?  @unique
+  name         String
+  role         UserRole @default(BUYER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  shops  Shop[]
+  orders Order[]
+}
+
+model Shop {
+  id          String     @id @default(uuid())
+  ownerId     String
+  owner       User       @relation(fields: [ownerId], references: [id])
+  name        String
+  slug        String     @unique
+  description String?
+  logoUrl     String?
+  bannerUrl   String?
+  status      ShopStatus @default(ACTIVE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  products Product[]
+  orders   Order[]
+  reels    Reel[]
+
+  @@index([ownerId])
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String
+  slug String @unique
+
+  products Product[]
+}
+
+model Product {
+  id          String        @id @default(uuid())
+  shopId      String
+  shop        Shop          @relation(fields: [shopId], references: [id])
+  title       String
+  description String?
+  priceCents  Int
+  currency    String        @default("BDT")
+  stockQty    Int           @default(0)
+  categoryId  String?
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  images      String[]      @default([])
+  status      ProductStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  orderItems OrderItem[]
+  reels      Reel[]
+
+  @@index([shopId])
+  @@index([status])
+}
+
+model Order {
+  id                String        @id @default(uuid())
+  buyerId           String?
+  buyer             User?         @relation(fields: [buyerId], references: [id])
+  shopId            String
+  shop              Shop          @relation(fields: [shopId], references: [id])
+  status            OrderStatus   @default(PLACED)
+  paymentMethod     PaymentMethod @default(COD)
+  totalCents        Int
+  currency          String        @default("BDT")
+  guestName         String?
+  guestPhone        String?
+  shippingAddress   String
+  shippingCity      String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  items OrderItem[]
+
+  @@index([shopId])
+  @@index([status])
+}
+
+model OrderItem {
+  id             String  @id @default(uuid())
+  orderId        String
+  order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product @relation(fields: [productId], references: [id])
+  quantity       Int
+  unitPriceCents Int
+
+  @@index([orderId])
+}
+
+model Reel {
+  id              String     @id @default(uuid())
+  shopId          String
+  shop            Shop       @relation(fields: [shopId], references: [id])
+  videoUrl        String
+  thumbnailUrl    String?
+  caption         String?
+  linkedProductId String?
+  linkedProduct   Product?   @relation(fields: [linkedProductId], references: [id])
+  status          ReelStatus @default(PUBLISHED)
+  viewCount       Int        @default(0)
+  createdAt       DateTime   @default(now())
+
+  @@index([status, createdAt])
+  @@index([shopId])
+}

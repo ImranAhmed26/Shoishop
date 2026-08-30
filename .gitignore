@@ -1,0 +1,42 @@
+# dependencies
+node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# env files
+.env
+.env.local
+.env*.local
+
+# build output
+.next/
+out/
+dist/
+build/
+/generated/prisma
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+/coverage
+
+# demo video source files (not committed — kept local only)
+Resouces/
+marketplace-web/public/reels/
+
+# leftover scaffold git history backups
+.git.scaffold-backup/
