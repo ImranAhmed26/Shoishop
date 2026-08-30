@@ -34,7 +34,11 @@ export class OrdersService {
       for (const item of dto.items) {
         const { count } = await tx.product.updateMany({
           where: { id: item.productId, stockQty: { gte: item.quantity } },
-          data: { stockQty: { decrement: item.quantity } },
+          data: {
+            stockQty: { decrement: item.quantity },
+            orderCount: { increment: 1 },
+            soldQty: { increment: item.quantity },
+          },
         });
         if (count === 0) {
           const title = productById.get(item.productId)?.title ?? item.productId;
@@ -56,6 +60,7 @@ export class OrdersService {
               productId: item.productId,
               quantity: item.quantity,
               unitPriceCents: productById.get(item.productId)!.priceCents,
+              totalPriceCents: productById.get(item.productId)!.priceCents * item.quantity,
             })),
           },
         },

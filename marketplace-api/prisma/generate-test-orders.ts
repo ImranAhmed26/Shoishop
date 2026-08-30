@@ -100,7 +100,12 @@ async function main() {
         const remaining = stockById.get(product.id) ?? 0;
         stockById.set(product.id, Math.max(0, remaining - quantity));
       }
-      return { productId: product.id, quantity, unitPriceCents: product.priceCents };
+      return {
+        productId: product.id,
+        quantity,
+        unitPriceCents: product.priceCents,
+        totalPriceCents: product.priceCents * quantity,
+      };
     });
     const totalCents = items.reduce((sum, item) => sum + item.unitPriceCents * item.quantity, 0);
 

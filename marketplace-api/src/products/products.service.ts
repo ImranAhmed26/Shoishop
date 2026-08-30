@@ -1,24 +1,70 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Product } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+
+export function slugify(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-+|-+$)/g, '');
+}
 
 @Injectable()
 export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(shopId: string, dto: CreateProductDto): Promise<Product> {
+  private async resolveBrandId(dto: {
+    brandId?: string;
+    brandName?: string;
+  }): Promise<string | undefined> {
+    if (dto.brandName?.trim()) {
+      const slug = slugify(dto.brandName);
+      const brand = await this.prisma.brand.upsert({
+        where: { slug },
+        update: {},
+        create: { name: dto.brandName.trim(), slug },
+      });
+      return brand.id;
+    }
+    return dto.brandId;
+  }
+
+  async generateUniqueSlug(shopId: string, title: string): Promise<string> {
+    const base = slugify(title) || 'product';
+    let slug = base;
+    let suffix = 2;
+    while (await this.prisma.product.findUnique({ where: { shopId_slug: { shopId, slug } } })) {
+      slug = `${base}-${suffix}`;
+      suffix += 1;
+    }
+    return slug;
+  }
+
+  async create(shopId: string, dto: CreateProductDto): Promise<Product> {
+    const [slug, brandId] = await Promise.all([
+      this.generateUniqueSlug(shopId, dto.title),
+      this.resolveBrandId(dto),
+    ]);
+
     return this.prisma.product.create({
       data: {
         shopId,
+        slug,
         title: dto.title,
         description: dto.description,
         priceCents: dto.priceCents,
+        compareAtPriceCents: dto.compareAtPriceCents,
+        costPriceCents: dto.costPriceCents,
         stockQty: dto.stockQty ?? 0,
+        weight: dto.weight,
         categoryId: dto.categoryId,
+        brandId,
         images: dto.images ?? [],
         status: dto.status ?? 'DRAFT',
+        visibility: dto.visibility ?? 'VISIBLE',
       },
     });
   }
@@ -27,7 +73,7 @@ export class ProductsService {
     return this.prisma.product.findMany({
       where: { shopId },
       orderBy: { createdAt: 'desc' },
-      include: { category: true },
+      include: { category: true, brand: true },
     });
   }
 
@@ -37,7 +83,27 @@ export class ProductsService {
       throw new NotFoundException('Product not found for this shop');
     }
 
-    return this.prisma.product.update({ where: { id: productId }, data: dto });
+    const brandId = await this.resolveBrandId(dto);
+    const data: Prisma.ProductUpdateInput = {
+      title: dto.title,
+      description: dto.description,
+      priceCents: dto.priceCents,
+      compareAtPriceCents: dto.compareAtPriceCents,
+      costPriceCents: dto.costPriceCents,
+      stockQty: dto.stockQty,
+      weight: dto.weight,
+      images: dto.images,
+      status: dto.status,
+      visibility: dto.visibility,
+    };
+    if (dto.categoryId !== undefined) {
+      data.category = dto.categoryId ? { connect: { id: dto.categoryId } } : { disconnect: true };
+    }
+    if (brandId !== undefined) {
+      data.brand = brandId ? { connect: { id: brandId } } : { disconnect: true };
+    }
+
+    return this.prisma.product.update({ where: { id: productId }, data });
   }
 
   async remove(shopId: string, productId: string): Promise<void> {
@@ -83,6 +149,7 @@ export class ProductsService {
     const pageSize = Math.min(48, Math.max(1, filters.pageSize ?? 24));
     const where = {
       status: 'PUBLISHED' as const,
+      visibility: 'VISIBLE' as const,
       shop: { status: 'ACTIVE' as const, slug: filters.shopSlug },
       category: filters.categorySlug ? { slug: filters.categorySlug } : undefined,
       title: filters.q ? { contains: filters.q, mode: 'insensitive' as const } : undefined,
@@ -103,7 +170,7 @@ export class ProductsService {
       this.prisma.product.findMany({
         where,
         orderBy,
-        include: { category: true, shop: true },
+        include: { category: true, brand: true, shop: true },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
@@ -116,11 +183,17 @@ export class ProductsService {
   async findOnePublic(productId: string) {
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
-      include: { category: true, shop: true },
+      include: { category: true, brand: true, shop: true },
     });
-    if (!product || product.status !== 'PUBLISHED') {
+    if (!product || product.status !== 'PUBLISHED' || product.visibility !== 'VISIBLE') {
       throw new NotFoundException('Product not found');
     }
+
+    await this.prisma.product.update({
+      where: { id: productId },
+      data: { viewCount: { increment: 1 } },
+    });
+
     const [withRating] = await this.attachRatings([product]);
     return withRating;
   }

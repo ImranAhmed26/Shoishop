@@ -4,13 +4,15 @@ import {
   IsArray,
   IsEnum,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
   Min,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
-import { ProductStatus } from '@prisma/client';
+import { ProductStatus, ProductVisibility } from '@prisma/client';
 
 export class CreateProductDto {
   @MinLength(2)
@@ -29,11 +31,40 @@ export class CreateProductDto {
   @Type(() => Number)
   @IsInt()
   @Min(0)
+  compareAtPriceCents?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  costPriceCents?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
   stockQty?: number;
 
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  weight?: number;
+
+  /** Pass null to clear the category on update; omit to leave it unchanged. */
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @IsUUID()
-  categoryId?: string;
+  categoryId?: string | null;
+
+  @IsOptional()
+  @IsUUID()
+  brandId?: string;
+
+  /** Convenience for the dashboard UI: find-or-create a Brand by name instead of an id. */
+  @IsOptional()
+  @IsString()
+  brandName?: string;
 
   @IsOptional()
   @IsArray()
@@ -44,4 +75,8 @@ export class CreateProductDto {
   @IsOptional()
   @IsEnum(ProductStatus)
   status?: ProductStatus;
+
+  @IsOptional()
+  @IsEnum(ProductVisibility)
+  visibility?: ProductVisibility;
 }

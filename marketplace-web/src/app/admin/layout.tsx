@@ -29,6 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="mb-6 flex items-center justify-between">
           <nav className="flex gap-4 text-sm">
             <Link href="/admin/products">Products</Link>
+            <Link href="/admin/categories">Categories</Link>
             <Link href="/admin/orders">Orders</Link>
             <Link href="/admin/reels">Reels</Link>
             <Link href="/admin/shops">Shops</Link>
