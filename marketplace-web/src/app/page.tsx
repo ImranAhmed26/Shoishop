@@ -21,9 +21,22 @@ interface PublicProductsPage {
   total: number;
 }
 
-async function getHomepageProducts(): Promise<PublicProductsPage> {
+interface HomeSearchParams {
+  q?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  sort?: string;
+}
+
+async function getHomepageProducts(searchParams: HomeSearchParams): Promise<PublicProductsPage> {
   try {
-    const res = await fetch(`${API_URL}/products?pageSize=24`, {
+    const params = new URLSearchParams({ pageSize: '24' });
+    if (searchParams.q) params.set('q', searchParams.q);
+    if (searchParams.minPrice) params.set('minPrice', searchParams.minPrice);
+    if (searchParams.maxPrice) params.set('maxPrice', searchParams.maxPrice);
+    if (searchParams.sort) params.set('sort', searchParams.sort);
+
+    const res = await fetch(`${API_URL}/products?${params.toString()}`, {
       next: { revalidate: 60 },
     });
     if (!res.ok) {
@@ -40,8 +53,19 @@ function formatPrice(cents: number, currency: string) {
   return `${(cents / 100).toFixed(2)} ${currency}`;
 }
 
-export default async function Home() {
-  const { items: products } = await getHomepageProducts();
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<HomeSearchParams>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const { items: products } = await getHomepageProducts(resolvedSearchParams);
+  const isFiltered = Boolean(
+    resolvedSearchParams.q ||
+      resolvedSearchParams.minPrice ||
+      resolvedSearchParams.maxPrice ||
+      (resolvedSearchParams.sort && resolvedSearchParams.sort !== 'newest'),
+  );
 
   const itemListJsonLd = {
     '@context': 'https://schema.org',
@@ -79,8 +103,79 @@ export default async function Home() {
       <div className="mt-8">
         <h1 className="text-lg font-semibold">Latest products</h1>
 
+        <form method="GET" className="mt-3 flex flex-wrap items-end gap-3 text-sm">
+          <div className="flex flex-col">
+            <label htmlFor="q" className="text-xs text-gray-500">
+              Search
+            </label>
+            <input
+              id="q"
+              name="q"
+              defaultValue={resolvedSearchParams.q ?? ''}
+              placeholder="Search products..."
+              className="rounded border border-gray-300 px-2 py-1"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="minPrice" className="text-xs text-gray-500">
+              Min price
+            </label>
+            <input
+              id="minPrice"
+              name="minPrice"
+              type="number"
+              min="0"
+              step="0.01"
+              defaultValue={resolvedSearchParams.minPrice ?? ''}
+              className="w-24 rounded border border-gray-300 px-2 py-1"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="maxPrice" className="text-xs text-gray-500">
+              Max price
+            </label>
+            <input
+              id="maxPrice"
+              name="maxPrice"
+              type="number"
+              min="0"
+              step="0.01"
+              defaultValue={resolvedSearchParams.maxPrice ?? ''}
+              className="w-24 rounded border border-gray-300 px-2 py-1"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="sort" className="text-xs text-gray-500">
+              Sort by
+            </label>
+            <select
+              id="sort"
+              name="sort"
+              defaultValue={resolvedSearchParams.sort ?? 'newest'}
+              className="rounded border border-gray-300 px-2 py-1"
+            >
+              <option value="newest">Newest</option>
+              <option value="price_asc">Price: low to high</option>
+              <option value="price_desc">Price: high to low</option>
+            </select>
+          </div>
+          <button
+            type="submit"
+            className="rounded bg-orange-600 px-3 py-1.5 text-white hover:bg-orange-700"
+          >
+            Apply
+          </button>
+          {isFiltered && (
+            <Link href="/" className="text-xs text-gray-500 underline">
+              Clear filters
+            </Link>
+          )}
+        </form>
+
         {products.length === 0 ? (
-          <p className="mt-4 text-sm text-gray-500">No products available yet.</p>
+          <p className="mt-4 text-sm text-gray-500">
+            {isFiltered ? 'No products match your filters.' : 'No products available yet.'}
+          </p>
         ) : (
           <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             {products.map((product) => (
