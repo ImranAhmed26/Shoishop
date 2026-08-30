@@ -11,8 +11,8 @@ import { Sidebar } from '@/components/dashboard/sidebar';
 import { IconBox, IconReceipt, IconFilm } from '@/components/dashboard/icons';
 
 const NAV_ITEMS = [
-  { href: '/dashboard/products', label: 'Products', icon: <IconBox /> },
   { href: '/dashboard/orders', label: 'Orders', icon: <IconReceipt /> },
+  { href: '/dashboard/products', label: 'Products', icon: <IconBox /> },
   { href: '/dashboard/reels', label: 'Reels', icon: <IconFilm /> },
 ];
 

@@ -10,10 +10,10 @@ import { Sidebar } from '@/components/dashboard/sidebar';
 import { IconBox, IconTag, IconAward, IconReceipt, IconFilm, IconStore, IconChart } from '@/components/dashboard/icons';
 
 const NAV_ITEMS = [
+  { href: '/admin/orders', label: 'Orders', icon: <IconReceipt /> },
   { href: '/admin/products', label: 'Products', icon: <IconBox /> },
   { href: '/admin/categories', label: 'Categories', icon: <IconTag /> },
   { href: '/admin/brands', label: 'Brands', icon: <IconAward /> },
-  { href: '/admin/orders', label: 'Orders', icon: <IconReceipt /> },
   { href: '/admin/reels', label: 'Reels', icon: <IconFilm /> },
   { href: '/admin/shops', label: 'Shops', icon: <IconStore /> },
   { href: '/admin/analytics', label: 'Analytics', icon: <IconChart /> },

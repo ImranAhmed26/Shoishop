@@ -255,9 +255,6 @@ export function ProductsManager() {
         <form onSubmit={handleCreate} className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <Card title="Description" className="lg:col-span-2">
-              <p className="text-xs text-gray-400">
-                Fields marked <span className="text-red-600">*</span> are required.
-              </p>
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col">
                   <label className="text-xs text-gray-500">
@@ -308,8 +305,8 @@ export function ProductsManager() {
                       onChange={(e) => setVisibility(e.target.value as ProductVisibility)}
                       className="rounded border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-transparent"
                     >
-                      <option value="VISIBLE">VISIBLE</option>
-                      <option value="HIDDEN">HIDDEN</option>
+                      <option value="VISIBLE">Visible</option>
+                      <option value="HIDDEN">Hidden</option>
                     </select>
                   </div>
                 </div>
@@ -675,8 +672,8 @@ export function ProductsManager() {
                                   onChange={(e) => setEditVisibility(e.target.value as ProductVisibility)}
                                   className="rounded border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-transparent"
                                 >
-                                  <option value="VISIBLE">VISIBLE</option>
-                                  <option value="HIDDEN">HIDDEN</option>
+                                  <option value="VISIBLE">Visible</option>
+                                  <option value="HIDDEN">Hidden</option>
                                 </select>
                               </div>
                               <div className="flex flex-col">
