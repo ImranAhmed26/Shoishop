@@ -30,7 +30,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <ShopProvider shops={shops} isAdminView={false}>
-      <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mx-auto max-w-7xl px-4 py-8">
         <div className="mb-6 flex items-center justify-between">
           <nav className="flex gap-4 text-sm">
             <Link href="/dashboard/products">Products</Link>

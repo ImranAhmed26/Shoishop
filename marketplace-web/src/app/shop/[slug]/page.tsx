@@ -15,15 +15,15 @@ export default function ShopPage({ params }: { params: Promise<{ slug: string }>
   const products = productsPage?.items;
 
   if (shopLoading) {
-    return <p className="mx-auto max-w-5xl px-4 py-8 text-sm text-gray-500">Loading shop...</p>;
+    return <p className="mx-auto max-w-7xl px-4 py-8 text-sm text-gray-500">Loading shop...</p>;
   }
 
   if (shopError || !shop) {
-    return <p className="mx-auto max-w-5xl px-4 py-8 text-sm text-gray-500">Shop not found.</p>;
+    return <p className="mx-auto max-w-7xl px-4 py-8 text-sm text-gray-500">Shop not found.</p>;
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-8">
       <h1 className="text-2xl font-semibold">{shop.name}</h1>
       {shop.description && <p className="mt-1 text-sm text-gray-500">{shop.description}</p>}
 
@@ -33,7 +33,7 @@ export default function ShopPage({ params }: { params: Promise<{ slug: string }>
         ) : products?.length === 0 ? (
           <p className="text-sm text-gray-500">No products available yet.</p>
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {products?.map((product) => (
               <Link
                 key={product.id}

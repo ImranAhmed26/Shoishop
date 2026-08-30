@@ -25,7 +25,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <ShopProvider shops={shops ?? []} isAdminView>
-      <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mx-auto max-w-7xl px-4 py-8">
         <div className="mb-6 flex items-center justify-between">
           <nav className="flex gap-4 text-sm">
             <Link href="/admin/products">Products</Link>

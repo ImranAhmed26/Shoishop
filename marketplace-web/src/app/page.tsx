@@ -92,7 +92,7 @@ export default async function Home({
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6">
+    <div className="mx-auto max-w-7xl px-4 py-6">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -177,7 +177,7 @@ export default async function Home({
             {isFiltered ? 'No products match your filters.' : 'No products available yet.'}
           </p>
         ) : (
-          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {products.map((product) => (
               <Link
                 key={product.id}
