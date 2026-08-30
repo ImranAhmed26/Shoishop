@@ -45,6 +45,19 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   shop?: Shop;
+  avgRating?: number | null;
+  reviewCount?: number;
+}
+
+export interface Review {
+  id: string;
+  productId: string;
+  buyerId: string;
+  orderId: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  buyer?: { name: string };
 }
 
 export type OrderStatus = 'PLACED' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
@@ -73,6 +86,7 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
+  shop?: Shop;
 }
 
 export type ReelStatus = 'PUBLISHED' | 'HIDDEN';

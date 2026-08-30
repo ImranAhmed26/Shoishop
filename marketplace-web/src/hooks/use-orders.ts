@@ -63,3 +63,10 @@ export function useUpdateOrderStatus(shopId: string | null) {
     },
   });
 }
+
+export function useMyOrders() {
+  return useQuery<Order[]>({
+    queryKey: ['orders', 'mine'],
+    queryFn: async () => (await api.get<Order[]>('/orders/mine')).data,
+  });
+}

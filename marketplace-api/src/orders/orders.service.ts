@@ -75,6 +75,14 @@ export class OrdersService {
     });
   }
 
+  findForBuyer(buyerId: string) {
+    return this.prisma.order.findMany({
+      where: { buyerId },
+      orderBy: { createdAt: 'desc' },
+      include: { items: { include: { product: true } }, shop: true },
+    });
+  }
+
   async updateStatus(shopId: string, orderId: string, status: Order['status']): Promise<Order> {
     const order = await this.prisma.order.findUnique({ where: { id: orderId } });
     if (!order || order.shopId !== shopId) {

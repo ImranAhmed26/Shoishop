@@ -23,22 +23,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return <div className="px-4 py-16 text-center text-sm text-gray-500">Loading...</div>;
   }
 
-  if (!shops || shops.length === 0) {
-    return (
-      <div className="px-4 py-16 text-center text-sm text-gray-500">
-        No shops on the platform yet.
-      </div>
-    );
-  }
-
   return (
-    <ShopProvider shops={shops} isAdminView>
+    <ShopProvider shops={shops ?? []} isAdminView>
       <div className="mx-auto max-w-5xl px-4 py-8">
         <div className="mb-6 flex items-center justify-between">
           <nav className="flex gap-4 text-sm">
             <Link href="/admin/products">Products</Link>
             <Link href="/admin/orders">Orders</Link>
             <Link href="/admin/reels">Reels</Link>
+            <Link href="/admin/shops">Shops</Link>
+            <Link href="/admin/analytics">Analytics</Link>
           </nav>
           <ShopSwitcher />
         </div>

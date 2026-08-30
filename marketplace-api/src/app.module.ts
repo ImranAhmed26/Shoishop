@@ -12,6 +12,8 @@ import { ProductsModule } from './products/products.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { OrdersModule } from './orders/orders.module';
 import { ReelsModule } from './reels/reels.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { ReelsModule } from './reels/reels.module';
     UploadsModule,
     OrdersModule,
     ReelsModule,
+    ReviewsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

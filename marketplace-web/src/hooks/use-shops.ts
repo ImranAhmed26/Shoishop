@@ -28,3 +28,14 @@ export function useCreateShop() {
     },
   });
 }
+
+export function useUpdateShopStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ shopId, status }: { shopId: string; status: Shop['status'] }) =>
+      (await api.patch<Shop>(`/shops/${shopId}`, { status })).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['shops'] });
+    },
+  });
+}

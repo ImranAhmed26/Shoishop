@@ -16,6 +16,7 @@ export function NavBar() {
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/">Home</Link>
           <Link href="/cart">Cart</Link>
+          {!isLoading && user && <Link href="/orders">My orders</Link>}
           {!isLoading && user && (user.role === 'SHOP_OWNER' || user.role === 'ADMIN') && (
             <Link href="/dashboard">Dashboard</Link>
           )}
