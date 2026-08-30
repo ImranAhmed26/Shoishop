@@ -48,16 +48,32 @@ export class ProductsService {
     await this.prisma.product.delete({ where: { id: productId } });
   }
 
-  findAllPublic(filters: { categorySlug?: string; shopSlug?: string }) {
-    return this.prisma.product.findMany({
-      where: {
-        status: 'PUBLISHED',
-        shop: { status: 'ACTIVE', slug: filters.shopSlug },
-        category: filters.categorySlug ? { slug: filters.categorySlug } : undefined,
-      },
-      orderBy: { createdAt: 'desc' },
-      include: { category: true, shop: true },
-    });
+  async findAllPublic(filters: {
+    categorySlug?: string;
+    shopSlug?: string;
+    page?: number;
+    pageSize?: number;
+  }) {
+    const page = Math.max(1, filters.page ?? 1);
+    const pageSize = Math.min(48, Math.max(1, filters.pageSize ?? 24));
+    const where = {
+      status: 'PUBLISHED' as const,
+      shop: { status: 'ACTIVE' as const, slug: filters.shopSlug },
+      category: filters.categorySlug ? { slug: filters.categorySlug } : undefined,
+    };
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.product.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        include: { category: true, shop: true },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return { items, total, page, pageSize };
   }
 
   async findOnePublic(productId: string): Promise<Product> {

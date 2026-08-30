@@ -11,7 +11,8 @@ function formatPrice(cents: number, currency: string) {
 export default function ShopPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const { data: shop, isLoading: shopLoading, isError: shopError } = useShopBySlug(slug);
-  const { data: products, isLoading: productsLoading } = usePublicProducts({ shop: slug });
+  const { data: productsPage, isLoading: productsLoading } = usePublicProducts({ shop: slug });
+  const products = productsPage?.items;
 
   if (shopLoading) {
     return <p className="mx-auto max-w-5xl px-4 py-8 text-sm text-gray-500">Loading shop...</p>;

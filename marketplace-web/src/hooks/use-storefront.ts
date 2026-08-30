@@ -12,10 +12,19 @@ export function useShopBySlug(slug: string) {
   });
 }
 
-export function usePublicProducts(filters: { shop?: string; category?: string } = {}) {
-  return useQuery<Product[]>({
+export interface PublicProductsPage {
+  items: Product[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export function usePublicProducts(
+  filters: { shop?: string; category?: string; page?: number; pageSize?: number } = {},
+) {
+  return useQuery<PublicProductsPage>({
     queryKey: ['products', filters],
-    queryFn: async () => (await api.get<Product[]>('/products', { params: filters })).data,
+    queryFn: async () => (await api.get<PublicProductsPage>('/products', { params: filters })).data,
   });
 }
 
