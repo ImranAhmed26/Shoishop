@@ -177,7 +177,7 @@ export default async function Home({
             {isFiltered ? 'No products match your filters.' : 'No products available yet.'}
           </p>
         ) : (
-          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {products.map((product) => (
               <Link
                 key={product.id}

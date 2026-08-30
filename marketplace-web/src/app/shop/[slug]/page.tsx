@@ -33,7 +33,7 @@ export default function ShopPage({ params }: { params: Promise<{ slug: string }>
         ) : products?.length === 0 ? (
           <p className="text-sm text-gray-500">No products available yet.</p>
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {products?.map((product) => (
               <Link
                 key={product.id}
