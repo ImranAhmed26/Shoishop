@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLogin } from '@/hooks/use-auth';
 import { loginSchema, firstFieldError } from '@/lib/validation';
+import { API_URL } from '@/lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -61,6 +62,17 @@ export default function LoginPage() {
           {login.isPending ? 'Logging in...' : 'Log in'}
         </button>
       </form>
+      <p className="mt-2 text-right text-sm">
+        <Link href="/forgot-password" className="text-gray-500 underline">
+          Forgot password?
+        </Link>
+      </p>
+      <a
+        href={`${API_URL}/auth/google`}
+        className="mt-4 flex items-center justify-center gap-2 rounded border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
+      >
+        Continue with Google
+      </a>
       <p className="mt-4 text-sm">
         No account?{' '}
         <Link href="/signup" className="underline">

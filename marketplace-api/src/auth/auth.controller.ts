@@ -10,8 +10,11 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import type { User } from '@prisma/client';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService, AuthTokens } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
 import type { AuthenticatedUser } from './decorators/current-user.decorator';
 import { Public } from './decorators/public.decorator';
@@ -79,5 +82,35 @@ export class AuthController {
   @Get('me')
   me(@CurrentUser() user: AuthenticatedUser) {
     return user;
+  }
+
+  @Public()
+  @Post('forgot-password')
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    await this.authService.requestPasswordReset(dto.email);
+    return { success: true };
+  }
+
+  @Public()
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    await this.authService.resetPassword(dto.token, dto.password);
+    return { success: true };
+  }
+
+  @Public()
+  @UseGuards(AuthGuard('google'))
+  @Get('google')
+  googleLogin() {
+    // Guard redirects to Google; this handler body never runs.
+  }
+
+  @Public()
+  @UseGuards(AuthGuard('google'))
+  @Get('google/callback')
+  async googleCallback(@CurrentUser() user: User, @Res() res: Response) {
+    const tokens = this.authService.issueTokens(user);
+    this.setAuthCookies(res, tokens);
+    res.redirect(process.env.FRONTEND_URL ?? 'http://localhost:3000');
   }
 }

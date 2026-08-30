@@ -50,6 +50,22 @@ export function useSignup() {
   });
 }
 
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: async (input: { email: string }) => {
+      await api.post('/auth/forgot-password', input);
+    },
+  });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: async (input: { token: string; password: string }) => {
+      await api.post('/auth/reset-password', input);
+    },
+  });
+}
+
 export function useLogout() {
   const queryClient = useQueryClient();
   return useMutation({
