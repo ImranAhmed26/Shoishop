@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSignup } from '@/hooks/use-auth';
+import { signupSchema, firstFieldError } from '@/lib/validation';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -12,11 +13,18 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'BUYER' | 'SHOP_OWNER'>('BUYER');
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setValidationError(null);
+    const result = signupSchema.safeParse({ name, email, password, role });
+    if (!result.success) {
+      setValidationError(firstFieldError(result.error));
+      return;
+    }
     try {
-      await signup.mutateAsync({ name, email, password, role });
+      await signup.mutateAsync(result.data);
       router.push('/');
     } catch {
       // error surfaced via signup.isError below
@@ -69,6 +77,7 @@ export default function SignupPage() {
             I want to sell
           </label>
         </fieldset>
+        {validationError && <p className="text-sm text-red-600">{validationError}</p>}
         {signup.isError && (
           <p className="text-sm text-red-600">
             Could not sign up. That email may already be registered.

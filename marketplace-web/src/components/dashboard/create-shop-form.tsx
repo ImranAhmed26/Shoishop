@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useCreateShop } from '@/hooks/use-shops';
+import { createShopSchema, firstFieldError } from '@/lib/validation';
 
 function slugify(value: string) {
   return value
@@ -14,10 +15,17 @@ function slugify(value: string) {
 export function CreateShopForm() {
   const createShop = useCreateShop();
   const [name, setName] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await createShop.mutateAsync({ name, slug: slugify(name) });
+    setValidationError(null);
+    const result = createShopSchema.safeParse({ name, slug: slugify(name) });
+    if (!result.success) {
+      setValidationError(firstFieldError(result.error));
+      return;
+    }
+    await createShop.mutateAsync(result.data);
   }
 
   return (
@@ -34,6 +42,7 @@ export function CreateShopForm() {
           onChange={(e) => setName(e.target.value)}
           className="rounded border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-transparent"
         />
+        {validationError && <p className="text-sm text-red-600">{validationError}</p>}
         <button
           type="submit"
           disabled={createShop.isPending || !name}

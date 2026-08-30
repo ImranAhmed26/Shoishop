@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useCart } from '@/contexts/cart-context';
 import { useCurrentUser } from '@/hooks/use-auth';
 import { api } from '@/lib/api';
+import { checkoutSchema, firstFieldError } from '@/lib/validation';
 
 function formatPrice(cents: number, currency: string) {
   return `${(cents / 100).toFixed(2)} ${currency}`;
@@ -47,8 +48,15 @@ export default function CheckoutPage() {
     e.preventDefault();
     setError(null);
 
-    if (!user && (!guestName || !guestPhone)) {
-      setError('Please provide your name and phone number.');
+    const result = checkoutSchema.safeParse({
+      isGuest: !user,
+      guestName,
+      guestPhone,
+      shippingAddress,
+      shippingCity,
+    });
+    if (!result.success) {
+      setError(firstFieldError(result.error));
       return;
     }
 

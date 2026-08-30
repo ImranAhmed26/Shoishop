@@ -10,6 +10,7 @@ import {
 } from '@/hooks/use-products';
 import { useBulkImportProducts, BulkImportSummary } from '@/hooks/use-bulk-import';
 import { API_URL } from '@/lib/api';
+import { createProductSchema, firstFieldError } from '@/lib/validation';
 
 function formatPrice(cents: number, currency: string) {
   return `${(cents / 100).toFixed(2)} ${currency}`;
@@ -27,6 +28,7 @@ export function ProductsManager() {
   const [price, setPrice] = useState('');
   const [stock, setStock] = useState('0');
   const [importSummary, setImportSummary] = useState<BulkImportSummary | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -41,12 +43,17 @@ export function ProductsManager() {
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     if (!shopId) return;
-    await createProduct.mutateAsync({
+    setValidationError(null);
+    const result = createProductSchema.safeParse({
       title,
       priceCents: Math.round(parseFloat(price) * 100),
       stockQty: parseInt(stock, 10) || 0,
-      status: 'PUBLISHED',
     });
+    if (!result.success) {
+      setValidationError(firstFieldError(result.error));
+      return;
+    }
+    await createProduct.mutateAsync({ ...result.data, status: 'PUBLISHED' });
     setTitle('');
     setPrice('');
     setStock('0');
@@ -98,6 +105,7 @@ export function ProductsManager() {
           {createProduct.isPending ? 'Adding...' : 'Add product'}
         </button>
       </form>
+      {validationError && <p className="text-sm text-red-600">{validationError}</p>}
 
       <div className="flex flex-wrap items-center gap-3 rounded border border-dashed border-gray-300 p-3 dark:border-gray-700">
         <span className="text-sm font-medium">Bulk import</span>

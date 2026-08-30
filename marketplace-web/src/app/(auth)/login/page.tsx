@@ -4,17 +4,25 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLogin } from '@/hooks/use-auth';
+import { loginSchema, firstFieldError } from '@/lib/validation';
 
 export default function LoginPage() {
   const router = useRouter();
   const login = useLogin();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setValidationError(null);
+    const result = loginSchema.safeParse({ email, password });
+    if (!result.success) {
+      setValidationError(firstFieldError(result.error));
+      return;
+    }
     try {
-      await login.mutateAsync({ email, password });
+      await login.mutateAsync(result.data);
       router.push('/');
     } catch {
       // error surfaced via login.isError below
@@ -41,6 +49,7 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           className="rounded border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-transparent"
         />
+        {validationError && <p className="text-sm text-red-600">{validationError}</p>}
         {login.isError && (
           <p className="text-sm text-red-600">Invalid email or password.</p>
         )}
