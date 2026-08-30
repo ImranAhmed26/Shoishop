@@ -3,6 +3,7 @@
 import { useShopContext } from '@/contexts/shop-context';
 import { useShopOrders, useUpdateOrderStatus } from '@/hooks/use-orders';
 import { OrderStatus } from '@/lib/types';
+import { ORDER_STATUS_META } from '@/lib/order-status';
 
 const STATUS_OPTIONS: OrderStatus[] = ['PLACED', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
@@ -51,11 +52,11 @@ export function OrdersManager() {
               onChange={(e) =>
                 updateStatus.mutate({ orderId: order.id, status: e.target.value as OrderStatus })
               }
-              className="rounded border border-gray-300 px-2 py-1 text-xs dark:border-gray-700 dark:bg-transparent"
+              className={`rounded border px-2 py-1 text-xs font-medium ${ORDER_STATUS_META[order.status].selectClass}`}
             >
               {STATUS_OPTIONS.map((status) => (
                 <option key={status} value={status}>
-                  {status}
+                  {ORDER_STATUS_META[status].label}
                 </option>
               ))}
             </select>
