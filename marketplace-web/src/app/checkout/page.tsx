@@ -139,7 +139,7 @@ export default function CheckoutPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-2 rounded bg-orange-600 hover:bg-orange-700 px-4 py-2 text-sm text-white disabled:opacity-50"
+          className="mt-2 rounded bg-brand-primary hover:bg-brand-primary-dark px-4 py-2 text-sm text-white disabled:opacity-50"
         >
           {isSubmitting ? 'Placing order...' : 'Place order (Cash on Delivery)'}
         </button>

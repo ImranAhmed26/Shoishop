@@ -6,7 +6,28 @@ import { useCurrentUser } from '@/hooks/use-auth';
 import { useAllShopsAdmin } from '@/hooks/use-shops';
 import { ShopProvider } from '@/contexts/shop-context';
 import { ShopSwitcher } from '@/components/dashboard/shop-switcher';
-import Link from 'next/link';
+import { Sidebar } from '@/components/dashboard/sidebar';
+import {
+  IconBox,
+  IconTag,
+  IconAward,
+  IconReceipt,
+  IconFilm,
+  IconStore,
+  IconChart,
+  IconSliders,
+} from '@/components/dashboard/icons';
+
+const NAV_ITEMS = [
+  { href: '/admin/orders', label: 'Orders', icon: <IconReceipt /> },
+  { href: '/admin/products', label: 'Products', icon: <IconBox /> },
+  { href: '/admin/categories', label: 'Categories', icon: <IconTag /> },
+  { href: '/admin/brands', label: 'Brands', icon: <IconAward /> },
+  { href: '/admin/reels', label: 'Reels', icon: <IconFilm /> },
+  { href: '/admin/shops', label: 'Shops', icon: <IconStore /> },
+  { href: '/admin/analytics', label: 'Analytics', icon: <IconChart /> },
+  { href: '/admin/customize', label: 'Customize App', icon: <IconSliders /> },
+];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -25,18 +46,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <ShopProvider shops={shops ?? []} isAdminView>
-      <div className="mx-auto max-w-7xl px-4 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <nav className="flex gap-4 text-sm">
-            <Link href="/admin/products">Products</Link>
-            <Link href="/admin/orders">Orders</Link>
-            <Link href="/admin/reels">Reels</Link>
-            <Link href="/admin/shops">Shops</Link>
-            <Link href="/admin/analytics">Analytics</Link>
-          </nav>
-          <ShopSwitcher />
+      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
+        <Sidebar items={NAV_ITEMS} homeHref="/" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-end border-b border-gray-200 bg-white px-6 py-3 dark:border-gray-800 dark:bg-gray-900">
+            <ShopSwitcher />
+          </div>
+          <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
         </div>
-        {children}
       </div>
     </ShopProvider>
   );

@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { Product, ProductStatus } from '@/lib/types';
+import { Product, ProductStatus, ProductVisibility } from '@/lib/types';
 
 export function useShopProducts(shopId: string | null) {
   return useQuery<Product[]>({
@@ -16,10 +16,18 @@ interface ProductInput {
   title: string;
   description?: string;
   priceCents: number;
+  compareAtPriceCents?: number;
+  costPriceCents?: number;
   stockQty?: number;
-  categoryId?: string;
+  weight?: number;
+  age?: string;
+  size?: string;
+  variation?: string;
+  categoryId?: string | null;
+  brandId?: string | null;
   images?: string[];
   status?: ProductStatus;
+  visibility?: ProductVisibility;
 }
 
 export function useCreateProduct(shopId: string | null) {

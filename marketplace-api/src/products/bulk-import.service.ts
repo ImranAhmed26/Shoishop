@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { parse } from 'csv-parse/sync';
 import ExcelJS from 'exceljs';
 import { PrismaService } from '../prisma/prisma.service';
+import { ProductsService } from './products.service';
 
 const TEMPLATE_HEADERS = ['title', 'description', 'price', 'stock', 'category', 'images', 'status'];
 
@@ -28,7 +29,10 @@ export interface BulkImportSummary {
 
 @Injectable()
 export class BulkImportService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly productsService: ProductsService,
+  ) {}
 
   buildTemplateCsv(): string {
     const sampleRow = [
@@ -121,9 +125,12 @@ export class BulkImportService {
         continue;
       }
 
+      const slug = await this.productsService.generateUniqueSlug(shopId, row.title!.trim());
+
       await this.prisma.product.create({
         data: {
           shopId,
+          slug,
           title: row.title!.trim(),
           description: row.description?.trim() || undefined,
           priceCents: Math.round(parseFloat(row.price!) * 100),

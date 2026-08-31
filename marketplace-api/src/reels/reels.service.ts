@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Reel } from '@prisma/client';
+import { Prisma, Reel } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReelDto } from './dto/create-reel.dto';
 import { UpdateReelDto } from './dto/update-reel.dto';
@@ -26,6 +26,7 @@ export class ReelsService {
     return this.prisma.reel.findMany({
       where: { shopId },
       orderBy: { createdAt: 'desc' },
+      include: { linkedProduct: true },
     });
   }
 
@@ -34,7 +35,19 @@ export class ReelsService {
     if (!reel || reel.shopId !== shopId) {
       throw new NotFoundException('Reel not found for this shop');
     }
-    return this.prisma.reel.update({ where: { id: reelId }, data: dto });
+
+    const data: Prisma.ReelUpdateInput = {
+      caption: dto.caption,
+      thumbnailUrl: dto.thumbnailUrl,
+      status: dto.status,
+    };
+    if (dto.linkedProductId !== undefined) {
+      data.linkedProduct = dto.linkedProductId
+        ? { connect: { id: dto.linkedProductId } }
+        : { disconnect: true };
+    }
+
+    return this.prisma.reel.update({ where: { id: reelId }, data });
   }
 
   async remove(shopId: string, reelId: string): Promise<void> {

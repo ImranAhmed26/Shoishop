@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useCurrentUser } from '@/hooks/use-auth';
 import { useMyOrders } from '@/hooks/use-orders';
+import { ORDER_STATUS_META } from '@/lib/order-status';
 
 function formatPrice(cents: number, currency: string) {
   return `${(cents / 100).toFixed(2)} ${currency}`;
@@ -46,8 +47,10 @@ export default function OrdersPage() {
                 </p>
                 <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleString()}</p>
               </div>
-              <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium">
-                {order.status}
+              <span
+                className={`rounded px-2 py-0.5 text-xs font-medium ${ORDER_STATUS_META[order.status].badgeClass}`}
+              >
+                {ORDER_STATUS_META[order.status].label}
               </span>
             </div>
             <ul className="mt-2 flex flex-col gap-1 text-xs text-gray-600">

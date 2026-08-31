@@ -55,13 +55,18 @@ export function useCreateReel(shopId: string | null) {
   });
 }
 
+interface ReelUpdateInput {
+  reelId: string;
+  caption?: string;
+  thumbnailUrl?: string;
+  linkedProductId?: string | null;
+  status?: ReelStatus;
+}
+
 export function useUpdateReel(shopId: string | null) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      reelId,
-      ...input
-    }: { reelId: string; caption?: string; status?: ReelStatus }) =>
+    mutationFn: async ({ reelId, ...input }: ReelUpdateInput) =>
       (await api.patch<Reel>(`/shops/${shopId}/reels/${reelId}`, input)).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['shops', shopId, 'reels'] });

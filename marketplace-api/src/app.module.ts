@@ -16,6 +16,8 @@ import { ReelsModule } from './reels/reels.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { AdminModule } from './admin/admin.module';
 import { CategoriesModule } from './categories/categories.module';
+import { BrandsModule } from './brands/brands.module';
+import { HomepageConfigModule } from './homepage-config/homepage-config.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { CategoriesModule } from './categories/categories.module';
     ReviewsModule,
     AdminModule,
     CategoriesModule,
+    BrandsModule,
+    HomepageConfigModule,
   ],
   controllers: [AppController],
   providers: [

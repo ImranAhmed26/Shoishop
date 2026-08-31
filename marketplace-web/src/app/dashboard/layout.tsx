@@ -7,7 +7,14 @@ import { useMyShops } from '@/hooks/use-shops';
 import { ShopProvider } from '@/contexts/shop-context';
 import { ShopSwitcher } from '@/components/dashboard/shop-switcher';
 import { CreateShopForm } from '@/components/dashboard/create-shop-form';
-import Link from 'next/link';
+import { Sidebar } from '@/components/dashboard/sidebar';
+import { IconBox, IconReceipt, IconFilm } from '@/components/dashboard/icons';
+
+const NAV_ITEMS = [
+  { href: '/dashboard/orders', label: 'Orders', icon: <IconReceipt /> },
+  { href: '/dashboard/products', label: 'Products', icon: <IconBox /> },
+  { href: '/dashboard/reels', label: 'Reels', icon: <IconFilm /> },
+];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -30,16 +37,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <ShopProvider shops={shops} isAdminView={false}>
-      <div className="mx-auto max-w-7xl px-4 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <nav className="flex gap-4 text-sm">
-            <Link href="/dashboard/products">Products</Link>
-            <Link href="/dashboard/orders">Orders</Link>
-            <Link href="/dashboard/reels">Reels</Link>
-          </nav>
-          <ShopSwitcher />
+      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
+        <Sidebar items={NAV_ITEMS} homeHref="/" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-end border-b border-gray-200 bg-white px-6 py-3 dark:border-gray-800 dark:bg-gray-900">
+            <ShopSwitcher />
+          </div>
+          <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
         </div>
-        {children}
       </div>
     </ShopProvider>
   );

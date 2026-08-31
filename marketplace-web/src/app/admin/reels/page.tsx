@@ -1,9 +1,10 @@
 import { ReelsManager } from '@/components/dashboard/reels-manager';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default function AdminReelsPage() {
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Reels</h1>
+      <PageHeader title="Reels" />
       <ReelsManager />
     </div>
   );

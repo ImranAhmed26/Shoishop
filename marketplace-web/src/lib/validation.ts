@@ -28,7 +28,10 @@ export const createShopSchema = z.object({
 export const createProductSchema = z.object({
   title: z.string().trim().min(1, 'Title is required'),
   priceCents: z.number().int().positive('Price must be greater than 0'),
+  compareAtPriceCents: z.number().int().min(0, 'Compare-at price cannot be negative').optional(),
+  costPriceCents: z.number().int().min(0, 'Cost price cannot be negative').optional(),
   stockQty: z.number().int().min(0, 'Stock cannot be negative'),
+  weight: z.number().min(0, 'Weight cannot be negative').optional(),
 });
 
 export const checkoutSchema = z

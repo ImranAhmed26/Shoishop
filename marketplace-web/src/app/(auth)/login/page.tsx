@@ -1,18 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useLogin } from '@/hooks/use-auth';
+import { useCurrentUser, useLogin } from '@/hooks/use-auth';
 import { loginSchema, firstFieldError } from '@/lib/validation';
 import { API_URL } from '@/lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
   const login = useLogin();
+  const { data: user, isLoading: userLoading } = useCurrentUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!userLoading && user) {
+      router.replace('/');
+    }
+  }, [user, userLoading, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,6 +35,10 @@ export default function LoginPage() {
     } catch {
       // error surfaced via login.isError below
     }
+  }
+
+  if (userLoading || user) {
+    return <div className="px-4 py-16 text-center text-sm text-gray-500">Loading...</div>;
   }
 
   return (
@@ -57,7 +68,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={login.isPending}
-          className="rounded bg-orange-600 hover:bg-orange-700 px-3 py-2 text-white disabled:opacity-50"
+          className="rounded bg-brand-primary hover:bg-brand-primary-dark px-3 py-2 text-white disabled:opacity-50"
         >
           {login.isPending ? 'Logging in...' : 'Log in'}
         </button>

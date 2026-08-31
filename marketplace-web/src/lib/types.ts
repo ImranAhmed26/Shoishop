@@ -23,6 +23,7 @@ export interface Shop {
 }
 
 export type ProductStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+export type ProductVisibility = 'VISIBLE' | 'HIDDEN';
 
 export interface Category {
   id: string;
@@ -30,18 +31,51 @@ export interface Category {
   slug: string;
 }
 
+export interface Brand {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export type HomepageLinkType = 'CATEGORY' | 'BRAND';
+
+export interface HomepageLink {
+  id: string;
+  type: HomepageLinkType;
+  label: string;
+  slug: string | null;
+}
+
+export interface HomepageConfig {
+  heroImageUrl: string | null;
+  links: HomepageLink[];
+}
+
 export interface Product {
   id: string;
   shopId: string;
   title: string;
+  slug: string;
   description: string | null;
   priceCents: number;
+  compareAtPriceCents: number | null;
+  costPriceCents: number | null;
   currency: string;
   stockQty: number;
+  weight: number | null;
+  age: string | null;
+  size: string | null;
+  variation: string | null;
   categoryId: string | null;
   category?: Category | null;
+  brandId: string | null;
+  brand?: Brand | null;
   images: string[];
   status: ProductStatus;
+  visibility: ProductVisibility;
+  viewCount: number;
+  orderCount: number;
+  soldQty: number;
   createdAt: string;
   updatedAt: string;
   shop?: Shop;
@@ -68,6 +102,7 @@ export interface OrderItem {
   productId: string;
   quantity: number;
   unitPriceCents: number;
+  totalPriceCents: number;
   product?: Product;
 }
 

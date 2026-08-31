@@ -116,7 +116,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <div>
           <h1 className="text-xl font-semibold">{product.title}</h1>
           {product.reviewCount ? (
-            <p className="mt-1 text-sm text-orange-600">
+            <p className="mt-1 text-sm text-brand-primary-dark">
               {'★'.repeat(Math.round(product.avgRating ?? 0))}
               {'☆'.repeat(5 - Math.round(product.avgRating ?? 0))}{' '}
               <span className="text-gray-500">

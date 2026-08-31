@@ -10,6 +10,7 @@ export class ProductsController {
   @Get()
   findAllPublic(
     @Query('category') categorySlug?: string,
+    @Query('brand') brandSlug?: string,
     @Query('shop') shopSlug?: string,
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
@@ -20,6 +21,7 @@ export class ProductsController {
   ) {
     return this.productsService.findAllPublic({
       categorySlug,
+      brandSlug,
       shopSlug,
       page: page ? parseInt(page, 10) : undefined,
       pageSize: pageSize ? parseInt(pageSize, 10) : undefined,

@@ -1,9 +1,10 @@
 import { ProductsManager } from '@/components/dashboard/products-manager';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default function DashboardProductsPage() {
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Products</h1>
+      <PageHeader title="Products" />
       <ProductsManager />
     </div>
   );

@@ -25,21 +25,23 @@ export class UploadsService {
     return ALLOWED_CONTENT_TYPES[kind].includes(contentType);
   }
 
-  async createPresignedUpload(kind: UploadKind, contentType: string) {
+  private buildPublicUrl(key: string): string {
     const bucket = process.env.AWS_S3_BUCKET as string;
+    return process.env.CDN_BASE_URL
+      ? `${process.env.CDN_BASE_URL.replace(/\/$/, '')}/${key}`
+      : `https://${bucket}.s3.${process.env.AWS_REGION ?? 'us-east-1'}.amazonaws.com/${key}`;
+  }
+
+  async createPresignedUpload(kind: UploadKind, contentType: string) {
     const key = `${PREFIX[kind]}/${randomUUID()}`;
 
     const command = new PutObjectCommand({
-      Bucket: bucket,
+      Bucket: process.env.AWS_S3_BUCKET as string,
       Key: key,
       ContentType: contentType,
     });
 
     const uploadUrl = await getSignedUrl(this.s3, command, { expiresIn: 60 * 5 });
-    const publicUrl = process.env.CDN_BASE_URL
-      ? `${process.env.CDN_BASE_URL.replace(/\/$/, '')}/${key}`
-      : `https://${bucket}.s3.${process.env.AWS_REGION ?? 'us-east-1'}.amazonaws.com/${key}`;
-
-    return { uploadUrl, publicUrl, key };
+    return { uploadUrl, publicUrl: this.buildPublicUrl(key), key };
   }
 }

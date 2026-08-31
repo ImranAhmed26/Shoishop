@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { ReelsFeed } from '@/components/reels/reels-feed';
 import { API_URL } from '@/lib/api';
-import { Product, Category } from '@/lib/types';
+import { Product, HomepageConfig } from '@/lib/types';
 
 export const metadata: Metadata = {
   title: 'Shoishop — Everything for Mom & Baby',
@@ -16,9 +15,12 @@ export const metadata: Metadata = {
   },
 };
 
+const PAGE_SIZE = 24;
+
 interface PublicProductsPage {
   items: Product[];
   total: number;
+  page: number;
 }
 
 interface HomeSearchParams {
@@ -26,11 +28,13 @@ interface HomeSearchParams {
   minPrice?: string;
   maxPrice?: string;
   sort?: string;
+  page?: string;
 }
 
 async function getHomepageProducts(searchParams: HomeSearchParams): Promise<PublicProductsPage> {
   try {
-    const params = new URLSearchParams({ pageSize: '24' });
+    const page = Math.max(1, parseInt(searchParams.page ?? '1', 10) || 1);
+    const params = new URLSearchParams({ pageSize: String(PAGE_SIZE), page: String(page) });
     if (searchParams.q) params.set('q', searchParams.q);
     if (searchParams.minPrice) params.set('minPrice', searchParams.minPrice);
     if (searchParams.maxPrice) params.set('maxPrice', searchParams.maxPrice);
@@ -40,22 +44,22 @@ async function getHomepageProducts(searchParams: HomeSearchParams): Promise<Publ
       next: { revalidate: 60 },
     });
     if (!res.ok) {
-      return { items: [], total: 0 };
+      return { items: [], total: 0, page };
     }
     const data = await res.json();
-    return { items: data.items ?? [], total: data.total ?? 0 };
+    return { items: data.items ?? [], total: data.total ?? 0, page };
   } catch {
-    return { items: [], total: 0 };
+    return { items: [], total: 0, page: 1 };
   }
 }
 
-async function getCategories(): Promise<Category[]> {
+async function getHomepageConfig(): Promise<HomepageConfig> {
   try {
-    const res = await fetch(`${API_URL}/categories`, { next: { revalidate: 300 } });
-    if (!res.ok) return [];
+    const res = await fetch(`${API_URL}/homepage-config`, { next: { revalidate: 30 } });
+    if (!res.ok) return { heroImageUrl: null, links: [] };
     return await res.json();
   } catch {
-    return [];
+    return { heroImageUrl: null, links: [] };
   }
 }
 
@@ -69,10 +73,22 @@ export default async function Home({
   searchParams: Promise<HomeSearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
-  const [{ items: products }, categories] = await Promise.all([
+  const [{ items: products, total, page }, homepageConfig] = await Promise.all([
     getHomepageProducts(resolvedSearchParams),
-    getCategories(),
+    getHomepageConfig(),
   ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  function pageHref(targetPage: number) {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams.q) params.set('q', resolvedSearchParams.q);
+    if (resolvedSearchParams.minPrice) params.set('minPrice', resolvedSearchParams.minPrice);
+    if (resolvedSearchParams.maxPrice) params.set('maxPrice', resolvedSearchParams.maxPrice);
+    if (resolvedSearchParams.sort) params.set('sort', resolvedSearchParams.sort);
+    if (targetPage > 1) params.set('page', String(targetPage));
+    const qs = params.toString();
+    return qs ? `/?${qs}` : '/';
+  }
   const isFiltered = Boolean(
     resolvedSearchParams.q ||
       resolvedSearchParams.minPrice ||
@@ -112,8 +128,15 @@ export default async function Home({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
 
-      <section className="bg-brand-cream">
-        <div className="mx-auto max-w-7xl px-4 py-10 text-center sm:py-14">
+      <section
+        className="bg-brand-cream bg-cover bg-center"
+        style={homepageConfig.heroImageUrl ? { backgroundImage: `url(${homepageConfig.heroImageUrl})` } : undefined}
+      >
+        <div
+          className={`mx-auto max-w-7xl px-4 py-10 text-center sm:py-14 ${
+            homepageConfig.heroImageUrl ? 'rounded-lg bg-white/80 backdrop-blur-sm dark:bg-black/50' : ''
+          }`}
+        >
           <p className="text-3xl sm:text-4xl" aria-hidden="true">
             🤰 🍼 👶
           </p>
@@ -127,19 +150,21 @@ export default async function Home({
       </section>
 
       <div className="mx-auto max-w-7xl px-4 py-6">
-        <ReelsFeed />
+        {/* Reels temporarily hidden on the homepage until that feature is revisited. */}
 
-        {categories.length > 0 && (
-          <nav aria-label="Categories" className="mt-6 flex flex-wrap gap-2 text-sm">
-            {categories.map((category) => (
-              <Link
-                key={category.slug}
-                href={`/category/${category.slug}`}
-                className="rounded-full border border-brand-secondary bg-white px-3 py-1 text-brand-ink hover:bg-brand-secondary/20"
-              >
-                {category.name}
-              </Link>
-            ))}
+        {homepageConfig.links.length > 0 && (
+          <nav aria-label="Shop by category or brand" className="mt-6 flex flex-wrap gap-2 text-sm">
+            {homepageConfig.links.map((link) =>
+              link.slug ? (
+                <Link
+                  key={link.id}
+                  href={link.type === 'CATEGORY' ? `/category/${link.slug}` : `/brand/${link.slug}`}
+                  className="rounded-full border border-brand-secondary bg-white px-3 py-1 text-brand-ink hover:bg-brand-secondary/20"
+                >
+                  {link.label}
+                </Link>
+              ) : null,
+            )}
           </nav>
         )}
 
@@ -248,6 +273,28 @@ export default async function Home({
               </Link>
             ))}
           </div>
+        )}
+
+        {totalPages > 1 && (
+          <nav aria-label="Pagination" className="mt-6 flex items-center justify-center gap-3 text-sm">
+            {page > 1 ? (
+              <Link href={pageHref(page - 1)} className="rounded border border-gray-300 px-3 py-1.5 hover:bg-gray-50">
+                ← Previous
+              </Link>
+            ) : (
+              <span className="rounded border border-gray-200 px-3 py-1.5 text-gray-300">← Previous</span>
+            )}
+            <span className="text-gray-500">
+              Page {page} of {totalPages}
+            </span>
+            {page < totalPages ? (
+              <Link href={pageHref(page + 1)} className="rounded border border-gray-300 px-3 py-1.5 hover:bg-gray-50">
+                Next →
+              </Link>
+            ) : (
+              <span className="rounded border border-gray-200 px-3 py-1.5 text-gray-300">Next →</span>
+            )}
+          </nav>
         )}
         </div>
       </div>

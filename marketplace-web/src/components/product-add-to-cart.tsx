@@ -24,7 +24,7 @@ export function ProductAddToCart({ product }: { product: Product }) {
     <button
       onClick={handleAddToCart}
       disabled={product.stockQty <= 0}
-      className="mt-4 rounded bg-orange-600 hover:bg-orange-700 px-4 py-2 text-sm text-white disabled:opacity-50"
+      className="mt-4 rounded bg-brand-primary hover:bg-brand-primary-dark px-4 py-2 text-sm text-white disabled:opacity-50"
     >
       {added ? 'Added!' : 'Add to cart'}
     </button>

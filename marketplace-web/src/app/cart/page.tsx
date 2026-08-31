@@ -57,7 +57,7 @@ export default function CartPage() {
       </div>
       <div className="mt-6 flex items-center justify-between">
         <p className="text-lg font-medium">Total: {formatPrice(total, currency)}</p>
-        <Link href="/checkout" className="rounded bg-orange-600 hover:bg-orange-700 px-4 py-2 text-sm text-white">
+        <Link href="/checkout" className="rounded bg-brand-primary hover:bg-brand-primary-dark px-4 py-2 text-sm text-white">
           Checkout
         </Link>
       </div>
