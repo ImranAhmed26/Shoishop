@@ -37,6 +37,20 @@ export interface Brand {
   slug: string;
 }
 
+export type HomepageLinkType = 'CATEGORY' | 'BRAND';
+
+export interface HomepageLink {
+  id: string;
+  type: HomepageLinkType;
+  label: string;
+  slug: string | null;
+}
+
+export interface HomepageConfig {
+  heroImageUrl: string | null;
+  links: HomepageLink[];
+}
+
 export interface Product {
   id: string;
   shopId: string;

@@ -123,6 +123,7 @@ export class ProductsService {
 
   async findAllPublic(filters: {
     categorySlug?: string;
+    brandSlug?: string;
     shopSlug?: string;
     page?: number;
     pageSize?: number;
@@ -138,6 +139,7 @@ export class ProductsService {
       visibility: 'VISIBLE' as const,
       shop: { status: 'ACTIVE' as const, slug: filters.shopSlug },
       category: filters.categorySlug ? { slug: filters.categorySlug } : undefined,
+      brand: filters.brandSlug ? { slug: filters.brandSlug } : undefined,
       title: filters.q ? { contains: filters.q, mode: 'insensitive' as const } : undefined,
       priceCents:
         filters.minPriceCents !== undefined || filters.maxPriceCents !== undefined

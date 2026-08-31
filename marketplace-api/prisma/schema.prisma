@@ -92,7 +92,8 @@ model Category {
   name String
   slug String @unique
 
-  products Product[]
+  products      Product[]
+  homepageLinks HomepageLink[]
 }
 
 model Brand {
@@ -100,7 +101,32 @@ model Brand {
   name String
   slug String @unique
 
-  products Product[]
+  products      Product[]
+  homepageLinks HomepageLink[]
+}
+
+enum HomepageLinkType {
+  CATEGORY
+  BRAND
+}
+
+model HomepageLink {
+  id         String           @id @default(uuid())
+  type       HomepageLinkType
+  order      Int              @default(0)
+  categoryId String?
+  category   Category?        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  brandId    String?
+  brand      Brand?           @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  createdAt  DateTime         @default(now())
+
+  @@index([order])
+}
+
+model SiteSettings {
+  id           String   @id @default("singleton")
+  heroImageUrl String?
+  updatedAt    DateTime @updatedAt
 }
 
 model Product {

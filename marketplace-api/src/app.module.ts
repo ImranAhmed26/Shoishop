@@ -17,6 +17,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { AdminModule } from './admin/admin.module';
 import { CategoriesModule } from './categories/categories.module';
 import { BrandsModule } from './brands/brands.module';
+import { HomepageConfigModule } from './homepage-config/homepage-config.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { BrandsModule } from './brands/brands.module';
     AdminModule,
     CategoriesModule,
     BrandsModule,
+    HomepageConfigModule,
   ],
   controllers: [AppController],
   providers: [

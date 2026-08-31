@@ -7,7 +7,16 @@ import { useAllShopsAdmin } from '@/hooks/use-shops';
 import { ShopProvider } from '@/contexts/shop-context';
 import { ShopSwitcher } from '@/components/dashboard/shop-switcher';
 import { Sidebar } from '@/components/dashboard/sidebar';
-import { IconBox, IconTag, IconAward, IconReceipt, IconFilm, IconStore, IconChart } from '@/components/dashboard/icons';
+import {
+  IconBox,
+  IconTag,
+  IconAward,
+  IconReceipt,
+  IconFilm,
+  IconStore,
+  IconChart,
+  IconSliders,
+} from '@/components/dashboard/icons';
 
 const NAV_ITEMS = [
   { href: '/admin/orders', label: 'Orders', icon: <IconReceipt /> },
@@ -17,6 +26,7 @@ const NAV_ITEMS = [
   { href: '/admin/reels', label: 'Reels', icon: <IconFilm /> },
   { href: '/admin/shops', label: 'Shops', icon: <IconStore /> },
   { href: '/admin/analytics', label: 'Analytics', icon: <IconChart /> },
+  { href: '/admin/customize', label: 'Customize App', icon: <IconSliders /> },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
