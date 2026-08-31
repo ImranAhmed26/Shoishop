@@ -55,7 +55,7 @@ async function getHomepageProducts(searchParams: HomeSearchParams): Promise<Publ
 
 async function getHomepageConfig(): Promise<HomepageConfig> {
   try {
-    const res = await fetch(`${API_URL}/homepage-config`, { next: { revalidate: 300 } });
+    const res = await fetch(`${API_URL}/homepage-config`, { next: { revalidate: 30 } });
     if (!res.ok) return { heroImageUrl: null, links: [] };
     return await res.json();
   } catch {
